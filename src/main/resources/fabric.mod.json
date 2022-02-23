@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "automessage",
+  "version": "${version}",
+  "name": "AutoMessage",
+  "description": "Automatically sends messages in the chat with options for content and time.",
+  "authors": [
+    "7Teen"
+  ],
+  "contact": {
+    "website": "github.com/7Teen17"
+  },
+  "license": "MIT",
+  "icon": "assets/AutoMessage/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.github.seventeen.automessage.client.AutoMessageClient"
+    ],
+    "main": [
+      "com.github.seventeen.automessage.AutoMessage"
+    ]
+  },
+  "mixins": [
+    "AutoMessage.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.18.1"
+  }
+}
