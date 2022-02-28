@@ -1,6 +1,5 @@
 package com.github.seventeen.automessage.command;
 
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
@@ -15,7 +14,7 @@ import java.util.Map;
 // {int id: [int taskId, "text string", int delayBetween, bool Enabled]}
 
 public class CommandCreator {
-    private Map<Integer, List> messages = new HashMap<>();
+    public static Map<String, List<Object>> messages = new HashMap<>();
         
     public static void createCommands() {
         ClientCommandManager.DISPATCHER.register(
@@ -26,32 +25,63 @@ public class CommandCreator {
                     return 0;
                 }).then(ClientCommandManager.literal("list").executes(ctx -> {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("§c§lList of auto messages:"));
+                    if (messages.isEmpty()) {
+                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("§aNone. Create one with /automessage add."));
+                        return 0;
+                    }
+                    for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
+                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of(entry.getKey()));
+                    }
                     return 0;
                 })).then(ClientCommandManager.literal("add")
-                        .then(ClientCommandManager.argument("Id", StringArgumentType.string()))
-                        .then(ClientCommandManager.argument("Delay", IntegerArgumentType.integer()))
+                        .then(ClientCommandManager.argument("Id", StringArgumentType.string())
+                        .then(ClientCommandManager.argument("Delay", IntegerArgumentType.integer())
                         .then(ClientCommandManager.argument("Content", StringArgumentType.greedyString())
                                 .executes(ctx -> {
-                                    //add a check for "all" id so that start command works
+                                    if (StringArgumentType.getString(ctx, "Id").equalsIgnoreCase("all")) {
+                                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Cannot use 'all' as a message id."));
+                                        return 1;
+                                    }
                                     ArrayList<Object> list = new ArrayList<>();
-                                    list.add(null);
+                                    list.add(0);
                                     list.add(StringArgumentType.getString(ctx, "Content"));
                                     list.add(IntegerArgumentType.getInteger(ctx, "Delay"));
-                                    list.add(true);
+                                    list.add(false);
+                                    messages.put(StringArgumentType.getString(ctx, "Id"), list);
+                                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Created automessage with id " + StringArgumentType.getString(ctx, "Id")));
                                     return 0;
-                        }))
+                        }))))
                 .executes(context -> {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("/automessage add <id> <delay> <content>"));
                     return 0;
                 })).then(ClientCommandManager.literal("start")
-                        .then(ClientCommandManager.argument("Id", StringArgumentType.string())).executes(ctx -> {
-                            //repeating task generation here
+                        .then(ClientCommandManager.argument("Id", StringArgumentType.string()).executes(ctx -> {
+                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
+                                return 1;
+                            }
+                            messages.get(StringArgumentType.getString(ctx,"Id")).set(3, true);
+                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started automessage with id " + StringArgumentType.getString(ctx, "Id")));
                             return 0;
-                })).then(ClientCommandManager.literal("stop")
-                        .then(ClientCommandManager.argument("Id", StringArgumentType.string())).executes(ctx -> {
-                            // stop code here
+                }))).then(ClientCommandManager.literal("stop")
+                        .then(ClientCommandManager.argument("Id", StringArgumentType.string()).executes(ctx -> {
+                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
+                                return 1;
+                            }
+                            messages.get(StringArgumentType.getString(ctx,"Id")).set(3, false);
+                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Stopped automessage with id " + StringArgumentType.getString(ctx, "Id")));
                             return 0;
-                        }))
+                }))).then(ClientCommandManager.literal("remove")
+                    .then(ClientCommandManager.argument("Id", StringArgumentType.string()).executes(ctx -> {
+                        if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
+                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
+                            return 1;
+                        }
+                        messages.remove(StringArgumentType.getString(ctx,"Id"));
+                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Removed automessage with id " + StringArgumentType.getString(ctx, "Id")));
+                        return 0;
+                        })))
         );
     }
 }
