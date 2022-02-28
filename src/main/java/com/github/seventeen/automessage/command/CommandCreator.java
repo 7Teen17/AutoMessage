@@ -81,7 +81,10 @@ public class CommandCreator {
                         messages.remove(StringArgumentType.getString(ctx,"Id"));
                             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Removed automessage with id " + StringArgumentType.getString(ctx, "Id")));
                         return 0;
-                        })))
+                }))).then(ClientCommandManager.literal("clear").executes(ctx -> {
+                    messages.clear();
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Cleared all automessages."));
+                }
         );
     }
 }
