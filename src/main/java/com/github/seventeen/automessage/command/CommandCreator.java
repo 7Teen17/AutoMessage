@@ -46,7 +46,7 @@ public class CommandCreator {
                                     list.add(0);
                                     list.add(StringArgumentType.getString(ctx, "Content"));
                                     list.add(IntegerArgumentType.getInteger(ctx, "Delay"));
-                                    list.add(false);
+                                    list.add(true);
                                     messages.put(StringArgumentType.getString(ctx, "Id"), list);
                                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Created automessage with id " + StringArgumentType.getString(ctx, "Id")));
                                     return 0;
@@ -84,7 +84,8 @@ public class CommandCreator {
                 }))).then(ClientCommandManager.literal("clear").executes(ctx -> {
                     messages.clear();
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Cleared all automessages."));
-                }
+                    return 0;
+                }))
         );
     }
 }
