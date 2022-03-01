@@ -46,7 +46,7 @@ public class CommandCreator {
                                     list.add(0);
                                     list.add(StringArgumentType.getString(ctx, "Content"));
                                     list.add(IntegerArgumentType.getInteger(ctx, "Delay"));
-                                    list.add(true);
+                                    list.add(false);
                                     messages.put(StringArgumentType.getString(ctx, "Id"), list);
                                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Created automessage with id " + StringArgumentType.getString(ctx, "Id")));
                                     return 0;
@@ -85,7 +85,30 @@ public class CommandCreator {
                     messages.clear();
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Cleared all automessages."));
                     return 0;
-                }))
+                })).then(ClientCommandManager.literal("set")
+                        .then(ClientCommandManager.literal("delay")
+                                .then(ClientCommandManager.argument("Id", StringArgumentType.string())
+                                .then(ClientCommandManager.argument("Delay", IntegerArgumentType.integer())
+                                        .executes(ctx -> {
+                                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
+                                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
+                                                return 1;
+                                            }
+                                            messages.get(StringArgumentType.getString(ctx, "Id")).set(2, IntegerArgumentType.getInteger(ctx, "Delay"));
+                                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Set delay of automessage with id " + StringArgumentType.getString(ctx, "Id") + " to " + IntegerArgumentType.getInteger(ctx, "Delay")));
+                                            return 0;
+                                        }))))
+                        .then(ClientCommandManager.literal("content")
+                                .then(ClientCommandManager.argument("Id", StringArgumentType.string())
+                                        .then(ClientCommandManager.argument("Content", StringArgumentType.greedyString()).executes(ctx -> {
+                                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
+                                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
+                                                return 1;
+                                            }
+                                            messages.get(StringArgumentType.getString(ctx, "Id")).set(1, StringArgumentType.getString(ctx, "Content"));
+                                            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Set content of automessage with id " + StringArgumentType.getString(ctx, "Id") + " to " + StringArgumentType.getString(ctx, "Content")));
+                                            return 0;
+                                        })))))
         );
     }
 }
