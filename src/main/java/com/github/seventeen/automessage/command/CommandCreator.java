@@ -60,6 +60,10 @@ public class CommandCreator {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
                             }
+                            if ((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3)) {
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already started."));
+                                return 0;
+                            }
                             messages.get(StringArgumentType.getString(ctx,"Id")).set(3, true);
                             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started automessage with id " + StringArgumentType.getString(ctx, "Id")));
                             return 0;
@@ -68,6 +72,10 @@ public class CommandCreator {
                             if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
+                            }
+                            if (!((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3))) {
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already stopped."));
+                                return 0;
                             }
                             messages.get(StringArgumentType.getString(ctx,"Id")).set(3, false);
                             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Stopped automessage with id " + StringArgumentType.getString(ctx, "Id")));
