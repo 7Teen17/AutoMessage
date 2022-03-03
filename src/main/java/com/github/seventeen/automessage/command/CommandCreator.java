@@ -60,6 +60,12 @@ public class CommandCreator {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
                             }
+                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == "all") {
+                                for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
+                                    entry.getValue().set(3, true);
+                                }
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started all automessages."));
+                            }
                             if ((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3)) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already started."));
                                 return 0;
@@ -72,6 +78,12 @@ public class CommandCreator {
                             if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
+                            }
+                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == "all") {
+                                for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
+                                    entry.getValue().set(3, false);
+                                }
+                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Stopped all automessages."));
                             }
                             if (!((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3))) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already stopped."));
