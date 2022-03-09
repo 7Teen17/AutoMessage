@@ -60,12 +60,6 @@ public class CommandCreator {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
                             }
-                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == "all") {
-                                for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
-                                    entry.getValue().set(3, true);
-                                }
-                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started all automessages."));
-                            }
                             if ((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3)) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already started."));
                                 return 0;
@@ -73,17 +67,11 @@ public class CommandCreator {
                             messages.get(StringArgumentType.getString(ctx,"Id")).set(3, true);
                             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started automessage with id " + StringArgumentType.getString(ctx, "Id")));
                             return 0;
-                }))).then(ClientCommandManager.literal("stop")
+                        }))).then(ClientCommandManager.literal("stop")
                         .then(ClientCommandManager.argument("Id", StringArgumentType.string()).executes(ctx -> {
                             if (messages.get(StringArgumentType.getString(ctx, "Id")) == null) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Automessage with id " + StringArgumentType.getString(ctx, "Id") + " not found."));
                                 return 1;
-                            }
-                            if (messages.get(StringArgumentType.getString(ctx, "Id")) == "all") {
-                                for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
-                                    entry.getValue().set(3, false);
-                                }
-                                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Stopped all automessages."));
                             }
                             if (!((Boolean) messages.get(StringArgumentType.getString(ctx,"Id")).get(3))) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("That automessage is already stopped."));
@@ -128,7 +116,19 @@ public class CommandCreator {
                                             messages.get(StringArgumentType.getString(ctx, "Id")).set(1, StringArgumentType.getString(ctx, "Content"));
                                             MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Set content of automessage with id " + StringArgumentType.getString(ctx, "Id") + " to " + StringArgumentType.getString(ctx, "Content")));
                                             return 0;
-                                        })))))
+                }))))).then(ClientCommandManager.literal("startall").executes(ctx -> {
+                    for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
+                        entry.getValue().set(3, true);
+                    }
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Started all automessages."));
+                    return 0;
+                })).then(ClientCommandManager.literal("stopall").executes(ctx -> {
+                    for (Map.Entry<String, List<Object>> entry : messages.entrySet()) {
+                        entry.getValue().set(3, false);
+                    }
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("Stopped all automessages."));
+                    return 0;
+                }))
         );
     }
 }
